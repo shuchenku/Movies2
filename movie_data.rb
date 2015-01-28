@@ -49,6 +49,7 @@ class MovieData
 		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
 		users_ratings = Array.new(user_count) {[]}
 
+		# Reads input file and loads data into the above structures
 		File.open(param) do |f|
 			f.each_line do |line|
 				cur_line = line.split(' ').map{|x| x.to_i}
@@ -133,11 +134,14 @@ class MovieData
 				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
 				user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
 			end
+
+			sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
 		end
 
-		return	sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
+		return	sim
 	end
 
+	# computes dot product of 2 vectors
 	def dot_product(vector1,vector2)
 		return product =  vector1.each_with_index.inject(0) {|sum,(el,idx)|
 			sum + el*vector2[idx]
@@ -146,16 +150,16 @@ class MovieData
 
 
 	def most_similar(u,test = nil)
-
+		# If the object user's similar users have already been computed, read from hash
 		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
-		# puts "\nMost similar users (Modified Pearson Correlation):"
+		# User indices in the training set
 		idx = *(1..@datahash[:training][:users_ratings].size)
-
 		if  test.nil?
 			idx = idx-[u]
 		end
 
+		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
 		idx.each {|i|
 			sim  = similarity(u,i,test)
@@ -164,6 +168,7 @@ class MovieData
 			end
 		}
 
+		# Cache the similar users list
 		@similar_user_cached[u] = most_similar_users
 		return most_similar_users
 	end
@@ -184,12 +189,15 @@ class MovieData
 
 	def predict(u,m)
 
+		# Users that are similar to u && also reviewed movie m
 		rates_by_su = most_similar(u, true)&viewers(m)
 
+		# If no such users then assume u will give it an average rating
 		if rates_by_su.size == 0
 			return @datahash[:training][:avg_rating][m-1]
 		end
 
+		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
 		total_stars = rates_by_su.inject(0) {|sum,el|
 				sum + (@datahash[:training][:users_ratings][el-1][movies(el).index(m)])
 			}
@@ -199,12 +207,14 @@ class MovieData
 
 	def run_test(k = nil)
 
+		# Check if test set size has been specified
 		if k.nil? || k > @datahash[:test][:full].size
 			max = @datahash[:test][:full].size
 		else
 			max = k
 		end
 
+		# Make predictions for every user/movie pair and store results in an array
 		predictions = []
 		user_idx = @datahash[:test][:full].transpose[0]
 		item_idx = @datahash[:test][:full].transpose[1]
@@ -222,7 +232,7 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u2)
+test = MovieData.new('ml-100k',:u5)
 test_obj = test.run_test()
 
 puts "mean err: #{test_obj.mean}"
@@ -231,20 +241,22 @@ puts "rms: #{test_obj.rms}"
 puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
-#     0.5 cutoff  0.3 cutoff
-# u1: 0.83735	  0.81515
-# u2: 0.82475	  0.8096
-# u3: 0.8153	  0.79995
-# u4: 0.80705	  0.80265
-# u5: 0.81275	  0.8126
+#     0.5 cutoff  0.5 cutoff
+# u1: 0.83735	  0.81215
+# u2: 0.82475	  0.8134
+# u3: 0.8153	  0.81165
+# u4: 0.80705	  0.8145
+# u5: 0.81275	  0.82285
 
 
-#   Test size 	  Runtime
-# 	10 			  0.7s
-#   100 		  0.7s
+#   Test size(u1) Runtime
+# 	10 			  1.1s
+#   100 		  1.1s
 #   1,000		  3.0s
-#   10,000		  29.6s
-#   20,000		  58.5s
-#
+#   10,000		  27.2s
+#   20,000		  67.6s
+#   20,000(u3,4,5)~150s
+
+
 
 

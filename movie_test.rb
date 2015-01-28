@@ -9,6 +9,7 @@ class MovieTest
 
 	end
 
+	# returns the average predication error
 	def mean()
 		diff = @p.each_with_index.inject(0) {|sum,(el,idx)|
 			sum + (@r[idx] - el).abs
@@ -16,6 +17,7 @@ class MovieTest
 		return mean_err = diff.to_f/@p.size
 	end
 
+	# returns the standard deviation of the error
 	def stddev
 		avgerr = mean()
 		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
@@ -24,6 +26,7 @@ class MovieTest
 		return stdderr = Math::sqrt(sqrd.to_f/@p.size)
 	end
 
+	# returns the root mean square error of the prediction
 	def rms
 		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
 			sum + (@r[idx] - el)**2
@@ -31,6 +34,7 @@ class MovieTest
 		return rms = Math::sqrt(sqrd.to_f/@p.size)		
 	end
 
+	# returns an array of the predictions in the form [u,m,r,p]
 	def to_a
 		return (@test_data[(0..@p.size-1)].transpose[(0..2)] << @p).transpose
 	end
