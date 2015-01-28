@@ -98,12 +98,10 @@ class MovieData
 		return poplist
 	end
 
-	def similarity(user1,user2,test = nil)
+	def similarity(user1,user2,obj = :test)
 
-		if test.nil?
-			obj = :training
-		else
-			obj = :test
+		obj = :training unless obj.nil?
+			
 		end
 
 		intersect = @datahash[obj][:users_reviewed][user1-1]&movies(user2)
