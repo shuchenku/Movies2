@@ -10,23 +10,23 @@ class MovieTest
 	end
 
 	def mean()
-		diff = (0..@p.size-1).inject(0) {|sum,el|
-			sum + (@r[el] - @p[el]).abs
+		diff = @p.each_with_index.inject(0) {|sum,(el,idx)|
+			sum + (@r[idx] - el).abs
 		}
 		return mean_err = diff.to_f/@p.size
 	end
 
 	def stddev
 		avgerr = mean()
-		sqrd = (0..@p.size-1).inject(0) {|sum,el|
-			sum + ((@r[el] - @p[el]).abs-avgerr)**2
+		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
+			sum + ((@r[idx] - el).abs-avgerr)**2
 		}
 		return stdderr = Math::sqrt(sqrd.to_f/@p.size)
 	end
 
 	def rms
-		sqrd = (0..@p.size-1).inject(0) {|sum,el|
-			sum + (@r[el] - @p[el])**2
+		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
+			sum + (@r[idx] - el)**2
 		}
 		return rms = Math::sqrt(sqrd.to_f/@p.size)		
 	end
