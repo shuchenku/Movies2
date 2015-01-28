@@ -31,9 +31,13 @@ class MovieData
 	def load_data(param,test = false)
 		# read file into a 2D array
 		h = []
-		File.readlines(param).each do |line|
-			h.push(line.split(' ').map{|x| x.to_i})
+		File.open(param) do |f|
+			f.each_line do |line|
+				h.push(line.split(' ').map{|x| x.to_i})
+			end
+			f.close()
 		end
+
 
 		# get number of movies and users
 		item_count = File.readlines(@info)[1].split[0].to_i
@@ -108,10 +112,14 @@ class MovieData
 
 		# Print out the list if needed
 		if print == true
-			puts "\nMost popular movies (descending):"
-			poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
+			print_popularity_list(poplist)
 		end
 		return poplist
+	end
+
+	# Print out the list if needed
+	def print_popularity_list(poplist)
+		poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
 	end
 
 	def similarity(user1,user2,obj = :test)
@@ -121,34 +129,48 @@ class MovieData
 
 		# Find movies that user1 and user2 reviewed in common
 		intersect = @datahash[obj][:users_reviewed][user1-1]&movies(user2)
-		
+
 		# If no moives in common then similarity index equals 0
-		if intersect.size == 0
+		if intersect.nil?
 			sim = 0
 		else
 			# otherwise determine similarity using Cosine Similarity
-			temp = intersect.size-1
-			numerator = (0..temp).inject(0) {|sum,el| 
-				sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(intersect[el])])*(@datahash[:training][:users_ratings][user2-1][movies(user2).index(intersect[el])])
-			} 
+			user1_vec = []
+			user2_vec = []
+			intersect.each do |el|
+				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
+				user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
+			end
 
-			term1 = (0..temp).inject(0) {|sum,el| 
-				sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(intersect[el])])**2
-			}
+			sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
 
-			term2 = (0..temp).inject(0) {|sum,el|
-				sum + (@datahash[:training][:users_ratings][user2-1][movies(user2).index(intersect[el])])**2
-			}
+			# numerator = intersect.inject(0) {|sum,el| 
+			# 	sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)])*(@datahash[:training][:users_ratings][user2-1][movies(user2).index(el)])
+			# } 
 
-			sim = [temp+1,20].min/20*numerator/Math::sqrt(term1)/Math::sqrt(term2)
+			# term1 = intersect.inject(0) {|sum,el| 
+			# 	sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)])**2
+			# }
+
+			# term2 = intersect.inject(0) {|sum,el|
+			# 	sum + (@datahash[:training][:users_ratings][user2-1][movies(user2).index(el)])**2
+			# }
+
+			# sim = [temp+1,20].min/20*numerator/Math::sqrt(term1)/Math::sqrt(term2)
 		end
 
 		return sim
 	end
 
+	def dot_product(vector1,vector2)
+		return product =  vector1.each_with_index.inject(0) {|sum,(el,idx)|
+			sum + el*vector2[idx]
+		}
+	end
+
+
 	def most_similar(u,test = nil)
 
-		
 		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
 		# puts "\nMost similar users (Modified Pearson Correlation):"
@@ -167,7 +189,6 @@ class MovieData
 		}
 
 		@similar_user_cached[u] = most_similar_users
-
 		return most_similar_users
 	end
 
