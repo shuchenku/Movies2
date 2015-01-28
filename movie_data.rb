@@ -138,28 +138,11 @@ class MovieData
 			user1_vec = []
 			user2_vec = []
 			intersect.each do |el|
-				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
-				user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
-			end
-
-			sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
-
-			# numerator = intersect.inject(0) {|sum,el| 
-			# 	sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)])*(@datahash[:training][:users_ratings][user2-1][movies(user2).index(el)])
-			# } 
-
-			# term1 = intersect.inject(0) {|sum,el| 
-			# 	sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)])**2
-			# }
-
-			# term2 = intersect.inject(0) {|sum,el|
-			# 	sum + (@datahash[:training][:users_ratings][user2-1][movies(user2).index(el)])**2
-			# }
-
-			# sim = [temp+1,20].min/20*numerator/Math::sqrt(term1)/Math::sqrt(term2)
+			user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
+			user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
 		end
 
-		return sim
+		return sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))	
 	end
 
 	def dot_product(vector1,vector2)
@@ -167,7 +150,6 @@ class MovieData
 			sum + el*vector2[idx]
 		}
 	end
-
 
 	def most_similar(u,test = nil)
 
@@ -207,10 +189,8 @@ class MovieData
 	end
 
 	def predict(u,m)
-		most_similar_users = most_similar(u, true)
 
-		m_reviewers = viewers(m)
-		rates_by_su = most_similar_users&m_reviewers
+		rates_by_su = most_similar(u, true)&viewers(m)
 
 		if rates_by_su.size == 0
 			return @datahash[:training][:avg_rating][m-1]
@@ -236,14 +216,12 @@ class MovieData
 		predictions = []
 		user_idx = @datahash[:test][:full].transpose[0]
 		item_idx = @datahash[:test][:full].transpose[1]
-		users_ratings = @datahash[:test][:full].transpose[2]
 
 		(0..max-1).each {|i|
 			predictions << predict(user_idx[i]-1,item_idx[i])
 		}
 
 	 	predictions_obj = MovieTest.new(predictions,@datahash[:test][:full])
-
 	end
 
 end
