@@ -6,7 +6,7 @@ class MovieData
 
 	def initialize(dir, test = nil)
 			# data info file location
-			@info = dir + "/u.info"
+			@info = File.join(dir,"u.info")
 			# hashmap to store data read from file as well as organized data structures
 			@datahash = Hash.new
 			# parameter for rescaling popularity index to 0~100 range
@@ -15,12 +15,12 @@ class MovieData
 			@similar_user_cached = Hash.new
 
 		if test.nil? # train full data (u.data) 
-			@data = dir + "/u.data"
+			@data = File.join(dir,"u.data")
 			# load data from file(s)
 			@datahash = {training:tmp = load_data(@data)}
 		else # run prediction
-			@data = dir + "/" << test.to_s << ".base"
-			@test = dir + "/" << test.to_s << ".test"
+			@data = File.join(dir,test.to_s << ".base")
+			@test = File.join(dir,test.to_s << ".test")
 			# load data from file(s)
 			@datahash = {training:tmp1 = load_data(@data), test: tmp2 = load_data(@test)}
 		end	
@@ -31,27 +31,15 @@ class MovieData
 	def load_data(param,test = false)
 		# read file into a 2D array
 		h = []
-		File.open(param) do |f|
-			f.each_line do |line|
-				h.push(line.split(' ').map{|x| x.to_i})
-			end
-			f.close()
-		end
-
 
 		# get number of movies and users
 		item_count = File.readlines(@info)[1].split[0].to_i
 		user_count = File.readlines(@info)[0].split[0].to_i
-		
-		user_idx = h.transpose[0]
-		item_idx = h.transpose[1]
-		item_rating = h.transpose[2]
 
 		# number of reviews per movie
 		review_count = Array.new(item_count){0}
 		# total stars received per movie
-		total_stars = Array.new(item_count){0}
-		
+		total_stars = Array.new(item_count){0}		
 		# Array of arrays. Each subarry stores users that viewed movies corresponding to idx in the main array 
 		movies_viewed_by = Array.new(item_count){[]}
 		# Array of movies' averge ratings received
@@ -61,14 +49,18 @@ class MovieData
 		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
 		users_ratings = Array.new(user_count) {[]}
 
-		# load data into the above arrays
-		(0..item_idx.size-1).each {|i|
-			review_count[item_idx[i]-1] += 1
-			total_stars[item_idx[i]-1] += item_rating[i]
-			movies_viewed_by[item_idx[i]-1] << user_idx[i]
-			users_reviewed[user_idx[i]-1] << item_idx[i]
-			users_ratings[user_idx[i]-1] << item_rating[i]
-		}
+		File.open(param) do |f|
+			f.each_line do |line|
+				cur_line = line.split(' ').map{|x| x.to_i}
+				review_count[cur_line[1]-1] += 1
+				total_stars[cur_line[1]-1] += cur_line[2]
+				movies_viewed_by[cur_line[1]-1] << cur_line[0]
+				users_reviewed[cur_line[0]-1] << cur_line[1]
+				users_ratings[cur_line[0]-1] << cur_line[2]
+				h.push(cur_line)
+			end
+			f.close()
+		end
 
 		# compute average ratings
 		average_rating.each_with_index {|avg,idx| 
@@ -230,7 +222,7 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u1)
+test = MovieData.new('ml-100k',:u2)
 test_obj = test.run_test()
 
 puts "mean err: #{test_obj.mean}"
