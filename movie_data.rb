@@ -28,6 +28,7 @@ class MovieData
 		@range = Math::log(datahash[:training][:review_count].max) - Math::log([datahash[:training][:review_count].min,1].max)
 	end
 
+	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
 	def load_data(param,test = false)
 		# read file into a 2D array
 		h = []
@@ -79,6 +80,7 @@ class MovieData
 
 	end
 
+	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
 		if datahash[:training][:review_count][movie_id-1] == 0
@@ -92,6 +94,7 @@ class MovieData
 		return pop
 	end
 
+	# this will generate a list of all movie_id’s ordered by decreasing popularity
 	def popularity_list(print)
 
 		# Make a hash of all movies' popularity indices
@@ -115,6 +118,7 @@ class MovieData
 		poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
 	end
 
+	# this will generate a number which indicates the similarity in movie preference between user1 and user2 (where higher numbers indicate greater similarity)
 	def similarity(user1,user2,obj = :test)
 
 		# Check if current run is for item in training set or test set
@@ -148,7 +152,7 @@ class MovieData
 		}
 	end
 
-
+	# this return a list of users whose tastes are most similar to the tastes of user u
 	def most_similar(u,test = nil)
 		# If the object user's similar users have already been computed, read from hash
 		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
@@ -173,20 +177,24 @@ class MovieData
 		return most_similar_users
 	end
 
+	# returns the array of movies that user u has watched
 	def movies(u)
 		return @datahash[:training][:users_reviewed][u-1]	
 	end
 
+	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
 		m_rating = 0
 		m_rating = @datahash[:training][:users_ratings][u-1][movies(u).index(m)] unless movies(u).index(m).nil?
 		return m_rating
 	end
 
+	# returns the array of users that have seen movie m
 	def viewers(m)
 		return @datahash[:training][:movie_reviewers][m-1]
 	end
 
+	# returns a floating point number between 1.0 and 5.0 as an estimate of what user u would rate movie m
 	def predict(u,m)
 
 		# Users that are similar to u && also reviewed movie m
@@ -205,6 +213,8 @@ class MovieData
 		return 	predicted = (total_stars.to_f/rates_by_su.size).round
 	end
 
+	# runs the z.predict method on the first k ratings in the test set and returns a MovieTest object containing the results.
+	# The parameter k is optional and if omitted, all of the tests will be run.
 	def run_test(k = nil)
 
 		# Check if test set size has been specified
