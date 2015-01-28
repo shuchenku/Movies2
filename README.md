@@ -1,3 +1,3 @@
-# movies2
+# movies-2
 
 Uses cosine similarity for rating predictions.
