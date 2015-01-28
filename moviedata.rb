@@ -138,11 +138,12 @@ class MovieData
 			user1_vec = []
 			user2_vec = []
 			intersect.each do |el|
-			user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
-			user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
+				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
+				user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
+			end
 		end
 
-		return sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))	
+		return	sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
 	end
 
 	def dot_product(vector1,vector2)
@@ -150,6 +151,7 @@ class MovieData
 			sum + el*vector2[idx]
 		}
 	end
+
 
 	def most_similar(u,test = nil)
 
@@ -200,9 +202,7 @@ class MovieData
 				sum + (@datahash[:training][:users_ratings][el-1][movies(el).index(m)])
 			}
 
-		predicted = (total_stars.to_f/rates_by_su.size).round
-
-		return predicted
+		return 	predicted = (total_stars.to_f/rates_by_su.size).round
 	end
 
 	def run_test(k = nil)
@@ -222,6 +222,7 @@ class MovieData
 		}
 
 	 	predictions_obj = MovieTest.new(predictions,@datahash[:test][:full])
+
 	end
 
 end
@@ -230,7 +231,7 @@ end
 
 
 test = MovieData.new('ml-100k',:u1)
-test_obj = test.run_test(100)
+test_obj = test.run_test()
 
 puts "mean err: #{test_obj.mean}"
 puts "stddev: #{test_obj.stddev}"
