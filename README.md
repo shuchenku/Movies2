@@ -1,3 +1,3 @@
 # movies2
 
-Uses cosine similarity for rating predictions
+Uses cosine similarity for rating predictions.
