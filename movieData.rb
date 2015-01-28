@@ -1,3 +1,5 @@
+load './movie_test.rb'
+
 class MovieData
 
 	attr_accessor :datahash
@@ -46,11 +48,16 @@ class MovieData
 		# total stars received per movie
 		total_stars = Array.new(item_count){0}
 		
+		# Array of arrays. Each subarry stores users that viewed movies corresponding to idx in the main array 
 		movies_viewed_by = Array.new(item_count){[]}
+		# Array of movies' averge ratings received
 		average_rating = Array.new(item_count){0}
+		# Array of arrays. Each subarry stores movie idx viewed by user corresponding to idx in the main array 
 		users_reviewed = Array.new(user_count){[]}
+		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
 		users_ratings = Array.new(user_count) {[]}
 
+		# load data into the above arrays
 		(0..item_idx.size-1).each {|i|
 			review_count[item_idx[i]-1] += 1
 			total_stars[item_idx[i]-1] += item_rating[i]
@@ -59,14 +66,17 @@ class MovieData
 			users_ratings[user_idx[i]-1] << item_rating[i]
 		}
 
+		# compute average ratings
 		average_rating.each_with_index {|avg,idx| 
 			if review_count[idx] == 0
+				# if not reviewed by any user, assign an average rating of 3
 				average_rating[idx] = 3
 			else
 				average_rating[idx] = (total_stars[idx].to_f/review_count[idx]).round
 			end
 		}
 
+		# hash to store the above arrays
 		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, avg_rating:average_rating, full:h}
 		return data
 
@@ -75,8 +85,10 @@ class MovieData
 	def popularity(movie_id)
 
 		if datahash[:training][:review_count][movie_id-1] == 0
+			# A movie that no one reviewed has a popularity index of 0 
 			pop = 0
 		else
+			# Take the log of review count and rescale to 0~100
 			pop = (Math::log(datahash[:training][:review_count][movie_id-1])/@range*100).round
 		end
 
@@ -84,13 +96,17 @@ class MovieData
 	end
 
 	def popularity_list(print)
+
+		# Make a hash of all movies' popularity indices
 		popularity_hash = Hash.new("n/a")
 		(1..datahash[:training][:review_count].size).each {|idx|
 		 	popularity_hash[idx] = popularity(idx)
 		}
 
+		# Sort the hash
 		poplist = popularity_hash.sort_by{|k,v| v}.reverse
 
+		# Print out the list if needed
 		if print == true
 			puts "\nMost popular movies (descending):"
 			poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
@@ -100,14 +116,17 @@ class MovieData
 
 	def similarity(user1,user2,obj = :test)
 
+		# Check if current run is for item in training set or test set
 		obj = :training unless obj.nil?
-			
-		end
 
+		# Find movies that user1 and user2 reviewed in common
 		intersect = @datahash[obj][:users_reviewed][user1-1]&movies(user2)
+		
+		# If no moives in common then similarity index equals 0
 		if intersect.size == 0
 			sim = 0
 		else
+			# otherwise determine similarity using Cosine Similarity
 			temp = intersect.size-1
 			numerator = (0..temp).inject(0) {|sum,el| 
 				sum + (@datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(intersect[el])])*(@datahash[:training][:users_ratings][user2-1][movies(user2).index(intersect[el])])
@@ -129,6 +148,7 @@ class MovieData
 
 	def most_similar(u,test = nil)
 
+		
 		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
 		# puts "\nMost similar users (Modified Pearson Correlation):"
@@ -208,53 +228,15 @@ class MovieData
 end
 
 
-class MovieTest
-
-	def initialize(predictions,test_data)
-		@u = test_data.transpose[0]
-		@m = test_data.transpose[1]
-		@r = test_data.transpose[2]
-		@p = predictions
-		@test_data = test_data
-
-	end
-
-	def mean()
-		diff = (0..@p.size-1).inject(0) {|sum,el|
-			sum + (@r[el] - @p[el]).abs
-		}
-		return mean_err = diff.to_f/@p.size
-	end
-
-	def stddev
-		avgerr = mean()
-		sqrd = (0..@p.size-1).inject(0) {|sum,el|
-			sum + ((@r[el] - @p[el]).abs-avgerr)**2
-		}
-		return stdderr = Math::sqrt(sqrd.to_f/@p.size)
-	end
-
-	def rms
-		sqrd = (0..@p.size-1).inject(0) {|sum,el|
-			sum + (@r[el] - @p[el])**2
-		}
-		return rms = Math::sqrt(sqrd.to_f/@p.size)		
-	end
-
-	def to_a
-		return (@test_data[(0..@p.size-1)].transpose[(0..2)] << @p).transpose
-	end
-
-end
 
 
-# test = MovieData.new('ml-100k',:u1)
-# test_obj = test.run_test()
+test = MovieData.new('ml-100k',:u1)
+test_obj = test.run_test(100)
 
-# puts "mean err: #{test_obj.mean}"
-# puts "stddev: #{test_obj.stddev}"
-# puts "rms: #{test_obj.rms}"
-# puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
+puts "mean err: #{test_obj.mean}"
+puts "stddev: #{test_obj.stddev}"
+puts "rms: #{test_obj.rms}"
+puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.3 cutoff
