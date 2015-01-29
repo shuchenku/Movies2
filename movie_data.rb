@@ -81,13 +81,14 @@ class MovieData
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
-		if datahash[:training][:review_count][movie_id-1] == 0
+		cur_movie = datahash[:training][:review_count][movie_id-1]
+		if cur_movie == 0
 			# A movie that no one reviewed has a popularity index of 0 
 			return 0
 		end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(datahash[:training][:review_count][movie_id-1])/@range*100).round
+		return pop = (Math::log(cur_movie)/@range*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
