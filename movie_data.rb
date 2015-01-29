@@ -246,7 +246,6 @@ puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 # u4: 0.80705	  0.8145
 # u5: 0.81275	  0.82285
 
-
 #   Test size(u1) Runtime
 # 	10 			  1.1s
 #   100 		  1.1s
