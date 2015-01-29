@@ -77,17 +77,15 @@ class MovieData
 
 		if datahash[:training][:review_count][movie_id-1] == 0
 			# A movie that no one reviewed has a popularity index of 0 
-			pop = 0
-		else
-			# Take the log of review count and rescale to 0~100
-			pop = (Math::log(datahash[:training][:review_count][movie_id-1])/@range*100).round
+			return 0
 		end
 
-		return pop
+		# Take the log of review count and rescale to 0~100
+		return pop = (Math::log(datahash[:training][:review_count][movie_id-1])/@range*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
-	def popularity_list(print)
+	def popularity_list(print = nil)
 
 		# Make a hash of all movies' popularity indices
 		popularity_hash = Hash.new("n/a")
@@ -99,9 +97,6 @@ class MovieData
 		poplist = popularity_hash.sort_by{|k,v| v}.reverse
 
 		# Print out the list if needed
-		if print == true
-			print_popularity_list(poplist)
-		end
 		return poplist
 	end
 
@@ -121,20 +116,19 @@ class MovieData
 
 		# If no moives in common then similarity index equals 0
 		if intersect.nil?
-			sim = 0
-		else
-			# otherwise determine similarity using Cosine Similarity
-			user1_vec = []
-			user2_vec = []
-			intersect.each do |el|
-				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
-				user2_vec << rating(user2,el)
-			end
-
-			sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
+			return 0
 		end
 
-		return	sim
+		# otherwise determine similarity using Cosine Similarity
+		user1_vec = []
+		user2_vec = []
+		intersect.each do |el|
+			user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
+			user2_vec << rating(user2,el)
+		end
+
+		return	sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
+	
 	end
 
 	# computes dot product of 2 vectors
@@ -149,17 +143,11 @@ class MovieData
 		# If the object user's similar users have already been computed, read from hash
 		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
-		# User indices in the training set
-		idx = *(1..@datahash[:training][:users_ratings].size)
-		if  test.nil?
-			idx = idx-[u]
-		end
-
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
-		idx.each {|i|
+		(1..@datahash[:training][:users_ratings].size).each {|i|
 			sim  = similarity(u,i,test)
-			most_similar_users << i unless sim<0.5
+			most_similar_users << i unless sim<0.5 || sim == 1
 		}
 
 		# Cache the similar users list
