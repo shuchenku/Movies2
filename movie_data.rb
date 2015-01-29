@@ -1,6 +1,6 @@
 load './movie_test.rb'
 
-class MovieData
+class Movie_Data
 
 	attr_accessor :datahash
 

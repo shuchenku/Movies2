@@ -1,4 +1,4 @@
-class MovieTest
+class Movie_Test
 
 	def initialize(predictions,test_data)
 		@u = test_data.transpose[0]
