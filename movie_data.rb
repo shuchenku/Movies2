@@ -238,8 +238,6 @@ puts "stddev: #{test_obj.stddev}"
 puts "rms: #{test_obj.rms}"
 puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
-
-
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
 # u1: 0.83735	  0.81215
