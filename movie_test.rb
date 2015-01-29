@@ -8,7 +8,7 @@ class Movie_Test
 		@test_data = test_data
 
 	end
-
+	
 	# returns the average predication error
 	def mean()
 		diff = @p.each_with_index.inject(0) {|sum,(el,idx)|

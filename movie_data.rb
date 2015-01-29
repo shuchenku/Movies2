@@ -230,13 +230,13 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u4)
-test_obj = test.run_test()
+# test = MovieData.new('ml-100k',:u4)
+# test_obj = test.run_test()
 
-puts "mean err: #{test_obj.mean}"
-puts "stddev: #{test_obj.stddev}"
-puts "rms: #{test_obj.rms}"
-puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
+# puts "mean err: #{test_obj.mean}"
+# puts "stddev: #{test_obj.stddev}"
+# puts "rms: #{test_obj.rms}"
+# puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
