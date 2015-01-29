@@ -1,6 +1,6 @@
 load './movie_test.rb'
 
-class Movie_Data
+class MovieData
 
 	attr_accessor :datahash
 
@@ -71,9 +71,11 @@ class Movie_Data
 	def avg_ratings()
 			# Array of movies' averge ratings received
 			average_rating = Array.new(@item_count){3}
+			total_stars = @datahash[:training][:total_stars]
+			review_count = @datahash[:training][:review_count]
 			average_rating.each_with_index {|avg,idx| 
-				stars = @datahash[:training][:total_stars][idx]
-				reviews = @datahash[:training][:review_count][idx]
+				stars = total_stars[idx]
+				reviews = review_count[idx]
 				average_rating[idx] = (stars.to_f/reviews).round unless reviews == 0
 		}
 		return average_rating
@@ -82,14 +84,14 @@ class Movie_Data
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
-		cur_movie = datahash[:training][:review_count][movie_id-1]
+		movies = datahash[:training][:review_count][movie_id-1]
 		if cur_movie == 0
 			# A movie that no one reviewed has a popularity index of 0 
 			return 0
 		end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(cur_movie)/@range*100).round
+		return pop = (Math::log(movies[movie_id-1])/@range*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
@@ -118,9 +120,11 @@ class Movie_Data
 
 		# Check if current run is for item in training set or test set
 		obj = :training unless obj.nil?
+		movies = @datahash[obj][:users_reviewed]
+		ratings = @datahash[obj][:users_ratings]
 
 		# Find movies that user1 and user2 reviewed in common
-		intersect = @datahash[obj][:users_reviewed][user1-1]&movies(user2)
+		intersect = movies[user1-1]&movies(user2)
 
 		# If no moives in common then similarity index equals 0
 		if intersect.nil?
@@ -131,8 +135,8 @@ class Movie_Data
 		user1_vec = []
 		user2_vec = []
 		intersect.each do |el|
-			movie_idx = @datahash[obj][:users_reviewed][user1-1].index(el)
-			user1_vec << @datahash[obj][:users_ratings][user1-1][movie_idx]
+			movie_idx = moives[user1-1].index(el)
+			user1_vec << ratings[user1-1][movie_idx]
 			user2_vec << rating(user2,el)
 		end
 
@@ -176,7 +180,8 @@ class Movie_Data
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
 		m_rating = 0
-		m_rating = @datahash[:training][:users_ratings][u-1][movies(u).index(m)] unless movies(u).index(m).nil?
+		ratings = @datahash[:training][:users_ratings]
+		m_rating = ratings[u-1][movies(u).index(m)] unless movies(u).index(m).nil?
 		return m_rating
 	end
 
