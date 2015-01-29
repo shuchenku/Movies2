@@ -217,6 +217,7 @@
           <div class="method-source-code" id="rms-source">
             <pre><span class="ruby-comment"># File movie_test.rb, line 30</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">rms</span>
+
         <span class="ruby-identifier">sqrd</span> = <span class="ruby-ivar">@p</span>.<span class="ruby-identifier">each_with_index</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">sum</span>,(<span class="ruby-identifier">el</span>,<span class="ruby-identifier">idx</span>)<span class="ruby-operator">|</span>
                 <span class="ruby-identifier">sum</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@r</span>[<span class="ruby-identifier">idx</span>] <span class="ruby-operator">-</span> <span class="ruby-identifier">el</span>)<span class="ruby-operator">**</span><span class="ruby-value">2</span>
         }
@@ -288,7 +289,7 @@
 
           
           <div class="method-source-code" id="to_a-source">
-            <pre><span class="ruby-comment"># File movie_test.rb, line 38</span>
+            <pre><span class="ruby-comment"># File movie_test.rb, line 39</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">to_a</span>
         <span class="ruby-keyword">return</span> (<span class="ruby-ivar">@test_data</span>[(<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-ivar">@p</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>)].<span class="ruby-identifier">transpose</span>[(<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>)] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@p</span>).<span class="ruby-identifier">transpose</span>
 <span class="ruby-keyword">end</span></pre>
