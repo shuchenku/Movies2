@@ -131,7 +131,7 @@ class MovieData
 			user2_vec = []
 			intersect.each do |el|
 				user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
-				user2_vec << @datahash[:training][:users_ratings][user2-1][movies(user2).index(el)]
+				user2_vec << rating(user2,el)
 			end
 
 			sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
@@ -162,9 +162,7 @@ class MovieData
 		most_similar_users = []
 		idx.each {|i|
 			sim  = similarity(u,i,test)
-			if sim>0.5
-				most_similar_users << i
-			end
+			most_similar_users << i unless sim<0.5
 		}
 
 		# Cache the similar users list
@@ -196,9 +194,7 @@ class MovieData
 		rates_by_su = most_similar(u, true)&viewers(m)
 
 		# If no such users then assume u will give it an average rating
-		if rates_by_su.size == 0
-			return @datahash[:training][:avg_rating][m-1]
-		end
+		return @datahash[:training][:avg_rating][m-1] unless rates_by_su.size != 0
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
 		total_stars = rates_by_su.inject(0) {|sum,el|
@@ -211,24 +207,23 @@ class MovieData
 	# runs the z.predict method on the first k ratings in the test set and returns a MovieTest object containing the results.
 	# The parameter k is optional and if omitted, all of the tests will be run.
 	def run_test(k = nil)
-
+		temp = @datahash[:test][:full]
 		# Check if test set size has been specified
 		if k.nil? || k > @datahash[:test][:full].size
-			max = @datahash[:test][:full].size
+			max = temp.size
 		else
 			max = k
 		end
 
 		# Make predictions for every user/movie pair and store results in an array
 		predictions = []
-		user_idx = @datahash[:test][:full].transpose[0]
-		item_idx = @datahash[:test][:full].transpose[1]
+		user_idx = temp.transpose[0]
+		item_idx = temp.transpose[1]
 
 		(0..max-1).each {|i|
 			predictions << predict(user_idx[i]-1,item_idx[i])
 		}
-
-	 	predictions_obj = MovieTest.new(predictions,@datahash[:test][:full])
+	 	predictions_obj = MovieTest.new(predictions,temp)
 
 	end
 
