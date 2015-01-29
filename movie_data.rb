@@ -6,7 +6,10 @@ class MovieData
 
 	def initialize(dir, test = nil)
 			# data info file location
-			@info = File.join(dir,"u.info")
+			info_file = File.readlines(File.join(dir,"u.info"))
+			# get number of movies and users
+			@item_count = info_file[1].split[0].to_i
+			@user_count = info_file[0].split[0].to_i
 			# cached similar users lists
 			@similar_user_cached = Hash.new
 
@@ -21,6 +24,7 @@ class MovieData
 
 		# load data from file(s)
 		@datahash[:training] = load_data(@data)
+		@datahash[:training][:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
 		@range = Math::log(datahash[:training][:review_count].max) - Math::log([datahash[:training][:review_count].min,1].max)
 	end
@@ -29,23 +33,19 @@ class MovieData
 	def load_data(param,test = false)
 		# read file into a 2D array
 		h = []
-		# get number of movies and users
-		info_file = File.readlines(@info)
-		item_count = info_file[1].split[0].to_i
-		user_count = info_file[0].split[0].to_i
 
 		# number of reviews per movie
-		review_count = Array.new(item_count){0}
+		review_count = Array.new(@item_count){0}
 		# total stars received per movie
-		total_stars = Array.new(item_count){0}		
+		total_stars = Array.new(@item_count){0}		
 		# Array of arrays. Each subarry stores users that viewed movies corresponding to idx in the main array 
-		movies_viewed_by = Array.new(item_count){[]}
+		movies_viewed_by = Array.new(@item_count){[]}
 		# Array of movies' averge ratings received
-		average_rating = Array.new(item_count){3}
+		average_rating = Array.new(@item_count){3}
 		# Array of arrays. Each subarry stores movie idx viewed by user corresponding to idx in the main array 
-		users_reviewed = Array.new(user_count){[]}
+		users_reviewed = Array.new(@user_count){[]}
 		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
-		users_ratings = Array.new(user_count) {[]}
+		users_ratings = Array.new(@user_count) {[]}
 
 		# Reads input file and loads data into the above structures
 		File.open(param) do |f|
@@ -67,9 +67,18 @@ class MovieData
 		}
 
 		# hash to store the above arrays
-		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, avg_rating:average_rating, full:h}
+		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, full:h}
 		return data
 
+	end
+
+	def avg_ratings()
+			# Array of movies' averge ratings received
+			average_rating = Array.new(@item_count){3}
+			average_rating.each_with_index {|avg,idx| 
+				average_rating[idx] = (@datahash[:training][:total_stars][idx].to_f/@datahash[:training][:review_count][idx]).round unless @datahash[:training][:review_count][idx] == 0
+		}
+		return average_rating
 	end
 
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
@@ -179,7 +188,7 @@ class MovieData
 		rates_by_su = most_similar(u, true)&viewers(m)
 
 		# If no such users then assume u will give it an average rating
-		return @datahash[:training][:avg_rating][m-1] unless rates_by_su.size != 0
+		return @datahash[:training][:avg_ratings][m-1] unless rates_by_su.size > 0
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
 		total_stars = rates_by_su.inject(0) {|sum,el|
@@ -217,7 +226,7 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u1)
+test = MovieData.new('ml-100k',:u4)
 test_obj = test.run_test()
 
 puts "mean err: #{test_obj.mean}"

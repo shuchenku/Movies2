@@ -28,6 +28,7 @@ class MovieTest
 
 	# returns the root mean square error of the prediction
 	def rms
+
 		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
 			sum + (@r[idx] - el)**2
 		}
