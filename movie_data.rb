@@ -207,7 +207,7 @@ class MovieData
 	def run_test(k = nil)
 		temp = @datahash[:test][:full]
 		# Check if test set size has been specified
-		if k.nil? || k > @datahash[:test][:full].size
+		if k.nil? || k > temp.size
 			max = temp.size
 		else
 			max = k
