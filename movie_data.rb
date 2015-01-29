@@ -34,8 +34,9 @@ class MovieData
 		h = []
 
 		# get number of movies and users
-		item_count = File.readlines(@info)[1].split[0].to_i
-		user_count = File.readlines(@info)[0].split[0].to_i
+		info_file = File.readlines(@info)
+		item_count = info_file[1].split[0].to_i
+		user_count = info_file[0].split[0].to_i
 
 		# number of reviews per movie
 		review_count = Array.new(item_count){0}
