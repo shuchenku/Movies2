@@ -16,15 +16,15 @@ class MovieData
 
 		if test.nil? # train full data (u.data) 
 			@data = File.join(dir,"u.data")
-			# load data from file(s)
-			@datahash = {training:tmp = load_data(@data)}
 		else # run prediction
 			@data = File.join(dir,test.to_s << ".base")
 			@test = File.join(dir,test.to_s << ".test")
 			# load data from file(s)
-			@datahash = {training:tmp1 = load_data(@data), test: tmp2 = load_data(@test)}
+			@datahash = {test:load_data(@test)}
 		end	
 
+		# load data from file(s)
+		@datahash[:training] = load_data(@data)
 		@range = Math::log(datahash[:training][:review_count].max) - Math::log([datahash[:training][:review_count].min,1].max)
 	end
 
@@ -32,7 +32,6 @@ class MovieData
 	def load_data(param,test = false)
 		# read file into a 2D array
 		h = []
-
 		# get number of movies and users
 		info_file = File.readlines(@info)
 		item_count = info_file[1].split[0].to_i
@@ -45,7 +44,7 @@ class MovieData
 		# Array of arrays. Each subarry stores users that viewed movies corresponding to idx in the main array 
 		movies_viewed_by = Array.new(item_count){[]}
 		# Array of movies' averge ratings received
-		average_rating = Array.new(item_count){0}
+		average_rating = Array.new(item_count){3}
 		# Array of arrays. Each subarry stores movie idx viewed by user corresponding to idx in the main array 
 		users_reviewed = Array.new(user_count){[]}
 		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
@@ -67,12 +66,7 @@ class MovieData
 
 		# compute average ratings
 		average_rating.each_with_index {|avg,idx| 
-			if review_count[idx] == 0
-				# if not reviewed by any user, assign an average rating of 3
-				average_rating[idx] = 3
-			else
-				average_rating[idx] = (total_stars[idx].to_f/review_count[idx]).round
-			end
+				average_rating[idx] = (total_stars[idx].to_f/review_count[idx]).round unless review_count[idx] == 0
 		}
 
 		# hash to store the above arrays
@@ -208,7 +202,7 @@ class MovieData
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
 		total_stars = rates_by_su.inject(0) {|sum,el|
-				sum + (@datahash[:training][:users_ratings][el-1][movies(el).index(m)])
+				sum + rating(el,m)
 			}
 
 		return 	predicted = (total_stars.to_f/rates_by_su.size).round
