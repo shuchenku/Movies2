@@ -61,11 +61,6 @@ class MovieData
 			f.close()
 		end
 
-		# compute average ratings
-		average_rating.each_with_index {|avg,idx| 
-				average_rating[idx] = (total_stars[idx].to_f/review_count[idx]).round unless review_count[idx] == 0
-		}
-
 		# hash to store the above arrays
 		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, full:h}
 		return data
@@ -76,7 +71,9 @@ class MovieData
 			# Array of movies' averge ratings received
 			average_rating = Array.new(@item_count){3}
 			average_rating.each_with_index {|avg,idx| 
-				average_rating[idx] = (@datahash[:training][:total_stars][idx].to_f/@datahash[:training][:review_count][idx]).round unless @datahash[:training][:review_count][idx] == 0
+				stars = @datahash[:training][:total_stars][idx]
+				reviews = @datahash[:training][:review_count][idx]
+				average_rating[idx] = (stars.to_f/reviews).round unless reviews == 0
 		}
 		return average_rating
 	end
