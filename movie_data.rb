@@ -26,7 +26,8 @@ class MovieData
 		@datahash[:training] = load_data(@data)
 		@datahash[:training][:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
-		@range = Math::log(datahash[:training][:review_count].max) - Math::log([datahash[:training][:review_count].min,1].max)
+		review_counts = datahash[:training][:review_count]
+		@range = Math::log(review_counts.max) - Math::log(review_counts.min,1].max)
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
