@@ -7,10 +7,6 @@ class MovieData
 	def initialize(dir, test = nil)
 			# data info file location
 			@info = File.join(dir,"u.info")
-			# hashmap to store data read from file as well as organized data structures
-			@datahash = Hash.new
-			# parameter for rescaling popularity index to 0~100 range
-			@range
 			# cached similar users lists
 			@similar_user_cached = Hash.new
 
@@ -19,12 +15,13 @@ class MovieData
 		else # run prediction
 			@data = File.join(dir,test.to_s << ".base")
 			@test = File.join(dir,test.to_s << ".test")
-			# load data from file(s)
+			# hashmap to store data read from file as well as organized data structures
 			@datahash = {test:load_data(@test)}
 		end	
 
 		# load data from file(s)
 		@datahash[:training] = load_data(@data)
+		# parameter for rescaling popularity index to 0~100 range
 		@range = Math::log(datahash[:training][:review_count].max) - Math::log([datahash[:training][:review_count].min,1].max)
 	end
 
@@ -220,8 +217,8 @@ class MovieData
 		user_idx = temp.transpose[0]
 		item_idx = temp.transpose[1]
 
-		(0..max-1).each {|i|
-			predictions << predict(user_idx[i]-1,item_idx[i])
+		user_idx[(0..max)].each_with_index {|uidx,idx|
+			predictions << predict(uidx-1,item_idx[idx])
 		}
 	 	predictions_obj = MovieTest.new(predictions,temp)
 
@@ -232,7 +229,7 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u5)
+test = MovieData.new('ml-100k',:u1)
 test_obj = test.run_test()
 
 puts "mean err: #{test_obj.mean}"
