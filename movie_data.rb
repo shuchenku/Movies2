@@ -129,11 +129,16 @@ class MovieData
 		user1_vec = []
 		user2_vec = []
 		intersect.each do |el|
-			user1_vec << @datahash[obj][:users_ratings][user1-1][@datahash[obj][:users_reviewed][user1-1].index(el)]
+			movie_idx = @datahash[obj][:users_reviewed][user1-1].index(el)
+			user1_vec << @datahash[obj][:users_ratings][user1-1][movie_idx]
 			user2_vec << rating(user2,el)
 		end
 
-		return	sim = [intersect.size,20].min/20*dot_product(user1_vec,user2_vec)/Math::sqrt(dot_product(user1_vec,user1_vec))/Math::sqrt(dot_product(user2_vec,user2_vec))
+		penalty = [intersect.size,20].min/20
+		numerator = dot_product(user1_vec,user2_vec)
+		denominator1 = Math::sqrt(dot_product(user1_vec,user1_vec))
+		denominator2 = Math::sqrt(dot_product(user2_vec,user2_vec))
+		return	sim = penalty*numerator/denominator1/denominator2
 	
 	end
 
