@@ -24,7 +24,6 @@ class MovieData
 
 		# load data from file(s)
 		@datahash[:training] = load_data(@data)
-		@datahash[:training][:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
 		@range = Math::log(@datahash[:training][:review_count].max) - Math::log([@datahash[:training][:review_count].min,1].max)
 	end
@@ -62,7 +61,7 @@ class MovieData
 		end
 
 		# hash to store the above arrays
-		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, full:h}
+		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, avg_ratings:avg_ratings(), total_stars:total_stars, full:h}
 		return data
 
 	end
@@ -70,8 +69,9 @@ class MovieData
 	def avg_ratings()
 			# Array of movies' averge ratings received
 			average_rating = Array.new(@item_count){3}
-			total_stars = @datahash[:training][:total_stars]
-			review_count = @datahash[:training][:review_count]
+			training = @datahash[:training]
+			total_stars = training[:total_stars]
+			review_count = training[:review_count]
 			average_rating.each_with_index {|avg,idx| 
 				stars = total_stars[idx]
 				reviews = review_count[idx]
@@ -98,7 +98,7 @@ class MovieData
 
 		# Make a hash of all movies' popularity indices
 		popularity_hash = Hash.new("n/a")
-		(1..datahash[:training][:review_count].size).each {|idx|
+		(1..@item_count).each {|idx|
 		 	popularity_hash[idx] = popularity(idx)
 		}
 
@@ -163,7 +163,7 @@ class MovieData
 		most_similar_users = []
 		(1..@user_count).each {|i|
 			sim  = similarity(u,i,test)
-			most_similar_users << i unless sim<0.5 || sim == 1
+			most_similar_users << i unless sim<0.5 or sim == 1
 		}
 
 		# Cache the similar users list
@@ -179,7 +179,8 @@ class MovieData
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
 		ratings = @datahash[:training][:users_ratings]
-		m_rating = ratings[u-1][movies(u).index(m)] unless movies(u).index(m).nil? {
+		movie_idx = movies(u).index(m)
+		m_rating = ratings[u-1][movie_idx] unless movie_idx.nil? {
 			m_rating = 0
 		}
 		return m_rating
@@ -197,7 +198,9 @@ class MovieData
 		rates_by_su = most_similar(u, true)&viewers(m)
 
 		# If no such users then assume u will give it an average rating
-		return @datahash[:training][:avg_ratings][m-1] unless rates_by_su.size > 0
+		if rates_by_su.nil?
+			return @datahash[:training][:avg_ratings][m-1]
+		end
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
 		total_stars = rates_by_su.inject(0) {|sum,el|
@@ -212,7 +215,7 @@ class MovieData
 	def run_test(k = nil)
 		temp = @datahash[:test][:full]
 		# Check if test set size has been specified
-		if k.nil? || k > temp.size
+		if k.nil? or k > temp.size
 			max = temp.size
 		else
 			max = k
