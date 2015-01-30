@@ -116,15 +116,17 @@ class MovieData
 	end
 
 	# this will generate a number which indicates the similarity in movie preference between user1 and user2 (where higher numbers indicate greater similarity)
-	def similarity(user1,user2,mode = nil)
+	def similarity(user1,user2,test = nil)
 
 		# Check if current run is for item in training set or test set
-		if mode == "test"
+		if test
 			obj = @test_hash
+		else
+			obj = @training_hash
 		end
 
-		movies = @test_hash[:users_reviewed]
-		ratings = @test_hash[:users_ratings]
+		movies = obj[:users_reviewed]
+		ratings = obj[:users_ratings]
 
 		# Find movies that user1 and user2 reviewed in common
 		intersect = movies[user1-1]&movies(user2)
@@ -143,7 +145,7 @@ class MovieData
 			user2_vec << rating(user2,el)
 		end
 
-		penalty = [intersect.size,20].min/20
+		penalty = [intersect.size,8].min/8
 		numerator = dot_product(user1_vec,user2_vec)
 		denominator1 = dot_product(user1_vec,user1_vec)
 		denominator2 = dot_product(user2_vec,user2_vec)
@@ -166,8 +168,8 @@ class MovieData
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
 		(1..@user_count).each {|i|
-			sim  = similarity(u,i,"test")
-			most_similar_users << i unless sim<0.5 or sim == 1
+			sim  = similarity(u,i,test)
+			most_similar_users << i unless sim<0.5 or (!test and u==i)
 		}
 
 		# Cache the similar users list
@@ -219,10 +221,10 @@ class MovieData
 	def run_test(k = nil)
 		temp = @test_hash[:full]
 		# Check if test set size has been specified
-		if k.nil? or k > temp.size
+		if k.nil?
 			max = temp.size
 		else
-			max = k
+			max = [k,temp.size].min
 		end
 
 		# Make predictions for every user/movie pair and store results in an array
