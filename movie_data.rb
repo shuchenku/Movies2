@@ -2,7 +2,7 @@ load './movie_test.rb'
 
 class MovieData
 
-	attr_accessor :datahash
+	# attr_accessor :datahash
 
 	def initialize(dir, test = nil)
 			# data info file location
@@ -19,14 +19,14 @@ class MovieData
 			@data = File.join(dir,test.to_s << ".base")
 			@test = File.join(dir,test.to_s << ".test")
 			# hashmap to store data read from file as well as organized data structures
-			@datahash = {test:load_data(@test)}
+			@test_hash = load_data(@test)
 		end	
 
 		# load data from file(s)
-		@datahash[:training] = load_data(@data)
-		@datahash[:training][:avg_ratings] = avg_ratings()
+		@training_hash = load_data(@data)
+		@training_hash[:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
-		@range = Math::log(@datahash[:training][:review_count].max) - Math::log([@datahash[:training][:review_count].min,1].max)
+		@range = Math::log(@training_hash[:review_count].max) - Math::log([@training_hash[:review_count].min,1].max)
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
@@ -70,7 +70,7 @@ class MovieData
 	def avg_ratings()
 			# Array of movies' averge ratings received
 			average_rating = Array.new(@item_count){3}
-			training = @datahash[:training]
+			training = @training_hash
 			total_stars = training[:total_stars]
 			review_count = training[:review_count]
 			average_rating.each_with_index {|avg,idx| 
@@ -84,7 +84,7 @@ class MovieData
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
-		movies = @datahash[:training][:review_count][movie_id-1]
+		movies = @training_hash[:review_count][movie_id-1]
 		if movies == 0
 			# A movie that no one reviewed has a popularity index of 0 
 			return 0
@@ -116,15 +116,15 @@ class MovieData
 	end
 
 	# this will generate a number which indicates the similarity in movie preference between user1 and user2 (where higher numbers indicate greater similarity)
-	def similarity(user1,user2,obj = nil)
+	def similarity(user1,user2,mode = nil)
 
 		# Check if current run is for item in training set or test set
-		if obj.nil?
-			obj = :training
+		if mode == "test"
+			obj = @test_hash
 		end
 
-		movies = @datahash[obj][:users_reviewed]
-		ratings = @datahash[obj][:users_ratings]
+		movies = @test_hash[:users_reviewed]
+		ratings = @test_hash[:users_ratings]
 
 		# Find movies that user1 and user2 reviewed in common
 		intersect = movies[user1-1]&movies(user2)
@@ -166,7 +166,7 @@ class MovieData
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
 		(1..@user_count).each {|i|
-			sim  = similarity(u,i,:test)
+			sim  = similarity(u,i,"test")
 			most_similar_users << i unless sim<0.5 or sim == 1
 		}
 
@@ -177,12 +177,12 @@ class MovieData
 
 	# returns the array of movies that user u has watched
 	def movies(u)
-		return @datahash[:training][:users_reviewed][u-1]	
+		return @training_hash[:users_reviewed][u-1]	
 	end
 
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
-		ratings = @datahash[:training][:users_ratings]
+		ratings = @training_hash[:users_ratings]
 		movie_idx = movies(u).index(m)
 		m_rating = ratings[u-1][movie_idx] unless movie_idx.nil? {
 			m_rating = 0
@@ -192,7 +192,7 @@ class MovieData
 
 	# returns the array of users that have seen movie m
 	def viewers(m)
-		return @datahash[:training][:movie_reviewers][m-1]
+		return @training_hash[:movie_reviewers][m-1]
 	end
 
 	# returns a floating point number between 1.0 and 5.0 as an estimate of what user u would rate movie m
@@ -203,7 +203,7 @@ class MovieData
 
 		# If no such users then assume u will give it an average rating
 		if rates_by_su.empty?
-			return @datahash[:training][:avg_ratings][m-1]
+			return @training_hash[:avg_ratings][m-1]
 		end
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
@@ -217,7 +217,7 @@ class MovieData
 	# runs the z.predict method on the first k ratings in the test set and returns a MovieTest object containing the results.
 	# The parameter k is optional and if omitted, all of the tests will be run.
 	def run_test(k = nil)
-		temp = @datahash[:test][:full]
+		temp = @test_hash[:full]
 		# Check if test set size has been specified
 		if k.nil? or k > temp.size
 			max = temp.size
