@@ -24,6 +24,7 @@ class MovieData
 
 		# load data from file(s)
 		@datahash[:training] = load_data(@data)
+		@datahash[:training][:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
 		@range = Math::log(@datahash[:training][:review_count].max) - Math::log([@datahash[:training][:review_count].min,1].max)
 	end
@@ -61,7 +62,7 @@ class MovieData
 		end
 
 		# hash to store the above arrays
-		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, avg_ratings:avg_ratings(), total_stars:total_stars, full:h}
+		data = {movie_reviewers:movies_viewed_by, users_reviewed:users_reviewed, users_ratings:users_ratings, review_count:review_count, total_stars:total_stars, full:h}
 		return data
 
 	end
@@ -83,7 +84,7 @@ class MovieData
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
-		movies = datahash[:training][:review_count][movie_id-1]
+		movies = @datahash[:training][:review_count][movie_id-1]
 		if movies == 0
 			# A movie that no one reviewed has a popularity index of 0 
 			return 0
@@ -198,7 +199,8 @@ class MovieData
 		rates_by_su = most_similar(u, true)&viewers(m)
 
 		# If no such users then assume u will give it an average rating
-		if rates_by_su.nil?
+		if rates_by_su.empty?
+			puts @datahash[:training][:avg_ratings].nil?
 			return @datahash[:training][:avg_ratings][m-1]
 		end
 
