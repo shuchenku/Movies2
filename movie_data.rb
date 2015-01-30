@@ -26,8 +26,7 @@ class MovieData
 		@datahash[:training] = load_data(@data)
 		@datahash[:training][:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
-		review_counts = datahash[:training][:review_count]
-		@range = Math::log(review_counts.max) - Math::log(review_counts.min,1].max)
+		@range = Math::log(@datahash[:training][:review_count].max) - Math::log([@datahash[:training][:review_count].min,1].max)
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
@@ -76,7 +75,7 @@ class MovieData
 			average_rating.each_with_index {|avg,idx| 
 				stars = total_stars[idx]
 				reviews = review_count[idx]
-				average_rating[idx] = (stars.to_f/reviews).round unless reviews == 0
+				avg = (stars.to_f/reviews).round unless reviews == 0
 		}
 		return average_rating
 	end
@@ -85,17 +84,17 @@ class MovieData
 	def popularity(movie_id)
 
 		movies = datahash[:training][:review_count][movie_id-1]
-		if cur_movie == 0
+		if movies == 0
 			# A movie that no one reviewed has a popularity index of 0 
 			return 0
 		end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(movies[movie_id-1])/@range*100).round
+		return pop = (Math::log(movies)/@range*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
-	def popularity_list(print = nil)
+	def popularity_list()
 
 		# Make a hash of all movies' popularity indices
 		popularity_hash = Hash.new("n/a")
@@ -135,7 +134,7 @@ class MovieData
 		user1_vec = []
 		user2_vec = []
 		intersect.each do |el|
-			movie_idx = moives[user1-1].index(el)
+			movie_idx = movies[user1-1].index(el)
 			user1_vec << ratings[user1-1][movie_idx]
 			user2_vec << rating(user2,el)
 		end
@@ -162,7 +161,7 @@ class MovieData
 
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
-		(1..@datahash[:training][:users_ratings].size).each {|i|
+		(1..@user_count).each {|i|
 			sim  = similarity(u,i,test)
 			most_similar_users << i unless sim<0.5 || sim == 1
 		}
@@ -179,9 +178,10 @@ class MovieData
 
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
-		m_rating = 0
 		ratings = @datahash[:training][:users_ratings]
-		m_rating = ratings[u-1][movies(u).index(m)] unless movies(u).index(m).nil?
+		m_rating = ratings[u-1][movies(u).index(m)] unless movies(u).index(m).nil? {
+			m_rating = 0
+		}
 		return m_rating
 	end
 
@@ -235,13 +235,15 @@ end
 
 
 
-# test = MovieData.new('ml-100k',:u4)
-# test_obj = test.run_test()
+test = MovieData.new('ml-100k',:u1)
+test_obj = test.run_test()
+# test.print_popularity_list(test.popularity_list())
 
-# puts "mean err: #{test_obj.mean}"
-# puts "stddev: #{test_obj.stddev}"
-# puts "rms: #{test_obj.rms}"
-# puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
+
+puts "mean err: #{test_obj.mean}"
+puts "stddev: #{test_obj.stddev}"
+puts "rms: #{test_obj.rms}"
+puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
