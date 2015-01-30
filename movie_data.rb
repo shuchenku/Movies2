@@ -2,8 +2,6 @@ load './movie_test.rb'
 
 class MovieData
 
-	# attr_accessor :datahash
-
 	def initialize(dir, test = nil)
 			# data info file location
 			info_file = File.readlines(File.join(dir,"u.info"))
@@ -146,11 +144,15 @@ class MovieData
 		end
 
 		penalty = [intersect.size,8].min/8
-		numerator = dot_product(user1_vec,user2_vec)
-		denominator1 = dot_product(user1_vec,user1_vec)
-		denominator2 = dot_product(user2_vec,user2_vec)
-		return	sim = penalty*numerator/Math::sqrt(denominator1*denominator2)
-	
+		return	sim = penalty*cosine_similarity(user1_vec,user2_vec)	
+	end
+
+	def cosine_similarity(vector1,vector2) 
+		numerator = dot_product(vector1,vector2)
+		denominator1 = dot_product(vector1,vector1)
+		denominator2 = dot_product(vector2,vector2)
+		cossim = numerator/Math::sqrt(denominator1*denominator2)
+		return cossim
 	end
 
 	# computes dot product of 2 vectors
