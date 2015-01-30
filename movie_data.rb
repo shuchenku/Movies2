@@ -24,7 +24,7 @@ class MovieData
 		@training_hash = load_data(@data)
 		@training_hash[:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
-		@range = Math::log(@training_hash[:review_count].max) - Math::log([@training_hash[:review_count].min,1].max)
+		@range = Math::log(@training_hash[:review_count].max)
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
@@ -246,9 +246,9 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u1)
+test = MovieData.new('ml-100k',:u4)
 test_obj = test.run_test()
-# test.print_popularity_list(test.popularity_list())
+test.print_popularity_list(test.popularity_list())
 
 
 puts "mean err: #{test_obj.mean}"
