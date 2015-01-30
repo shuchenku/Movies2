@@ -116,10 +116,13 @@ class MovieData
 	end
 
 	# this will generate a number which indicates the similarity in movie preference between user1 and user2 (where higher numbers indicate greater similarity)
-	def similarity(user1,user2,obj = :test)
+	def similarity(user1,user2,obj = nil)
 
 		# Check if current run is for item in training set or test set
-		obj = :training unless obj.nil?
+		if obj.nil?
+			obj = :training
+		end
+
 		movies = @datahash[obj][:users_reviewed]
 		ratings = @datahash[obj][:users_ratings]
 
@@ -142,9 +145,9 @@ class MovieData
 
 		penalty = [intersect.size,20].min/20
 		numerator = dot_product(user1_vec,user2_vec)
-		denominator1 = Math::sqrt(dot_product(user1_vec,user1_vec))
-		denominator2 = Math::sqrt(dot_product(user2_vec,user2_vec))
-		return	sim = penalty*numerator/denominator1/denominator2
+		denominator1 = dot_product(user1_vec,user1_vec)
+		denominator2 = dot_product(user2_vec,user2_vec)
+		return	sim = penalty*numerator/Math::sqrt(denominator1*denominator2)
 	
 	end
 
@@ -163,7 +166,7 @@ class MovieData
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
 		(1..@user_count).each {|i|
-			sim  = similarity(u,i,test)
+			sim  = similarity(u,i,:test)
 			most_similar_users << i unless sim<0.5 or sim == 1
 		}
 
@@ -200,7 +203,6 @@ class MovieData
 
 		# If no such users then assume u will give it an average rating
 		if rates_by_su.empty?
-			puts @datahash[:training][:avg_ratings].nil?
 			return @datahash[:training][:avg_ratings][m-1]
 		end
 
