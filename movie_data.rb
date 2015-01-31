@@ -4,10 +4,13 @@ class MovieData
 
 	def initialize(dir, test = nil)
 			# data info file location
-			info_file = File.readlines(File.join(dir,"u.info"))
+			# info_file = File.readlines(File.join(dir,"u.info"))
 			# get number of movies and users
-			@item_count = info_file[1].split[0].to_i
-			@user_count = info_file[0].split[0].to_i
+			@item_count = 1682
+			@user_count = 943
+			# @item_count = info_file[1].split[0].to_i
+			# @user_count = info_file[0].split[0].to_i
+
 			# cached similar users lists
 			@similar_user_cached = Hash.new
 
