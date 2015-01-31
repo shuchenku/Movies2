@@ -24,7 +24,7 @@ class MovieData
 		@training_hash = load_data(@data)
 		@training_hash[:avg_ratings] = avg_ratings()
 		# parameter for rescaling popularity index to 0~100 range
-		@range = Math::log(@training_hash[:review_count].max)
+		@range = @training_hash[:review_count].max
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
@@ -88,7 +88,7 @@ class MovieData
 		end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(movies)/@range*100).round
+		return pop = (Math::log(movies,@range)*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
