@@ -64,12 +64,12 @@ class MovieData
 	# Average rating of movie m
 	def avg_rating(m)
 
-		total_stars = @training_hash[:total_stars]
+		total_stars = @training_hash[:total_stars][m-1]
 		review_count = @training_hash[:review_count][m-1]
-		if total_stars[m-1] == 0
+		if total_stars == 0
 			avg = 0
 		else
-			avg = (total_stars[m-1].to_f/review_count[m-1]).round
+			avg = (total_stars.to_f/review_count).round
 		end
 		return avg
 	end
@@ -77,10 +77,10 @@ class MovieData
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
-		movies = @training_hash[:review_count][movie_id-1]
-		# Take the log of review count and rescale to 0~100
-		x = movies+1
+		x = @training_hash[:review_count][movie_id-1]+1
 		base = @training_hash[:review_count].max+1
+
+		# Take the log of review count and rescale to 0~100
 		return pop = (Math::log(x,base)*100).round
 	end
 
@@ -178,9 +178,8 @@ class MovieData
 
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
 	def rating(u,m)
-		ratings = @training_hash[:users_ratings]
 		movie_idx = movies(u).index(m)
-		m_rating = ratings[u-1][movie_idx] unless movie_idx.nil? {
+		m_rating = @training_hash[:users_ratings][u-1][movie_idx] unless movie_idx.nil? {
 			m_rating = 0
 		}
 		return m_rating
