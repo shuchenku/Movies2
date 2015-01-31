@@ -129,10 +129,10 @@ class MovieData
 		# otherwise determine similarity using Cosine Similarity
 		user1_vec = []
 		user2_vec = []
-		intersect.each do |el|
-			movie_idx = movies[user1-1].index(el)
-			user1_vec << ratings[user1-1][movie_idx]
-			user2_vec << rating(user2,el)
+ 		intersect.each do |el|
+            movie_idx = movies[user1-1].index(el)
+            user1_vec << ratings[user1-1][movie_idx]
+            user2_vec << rating(user2,el)
 		end
 
 		penalty = [intersect.size,8].min/8
@@ -177,13 +177,14 @@ class MovieData
 	end
 
 	# returns the rating that user u gave movie m in the training set, and 0 if user u did not rate movie m
-	def rating(u,m)
-		movie_idx = movies(u).index(m)
-		m_rating = @training_hash[:users_ratings][u-1][movie_idx] unless movie_idx.nil? {
-			m_rating = 0
-		}
-		return m_rating
-	end
+	  def rating(u,m)
+        ratings = @training_hash[:users_ratings]
+        movie_idx = movies(u).index(m)
+        m_rating = ratings[u-1][movie_idx] unless movie_idx.nil? {
+            m_rating = 0
+        }
+        return m_rating
+    end
 
 	# returns the array of users that have seen movie m
 	def viewers(m)
