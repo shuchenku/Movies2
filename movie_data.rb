@@ -110,13 +110,12 @@ class MovieData
 
 		# Check if current run is for item in training set or test set
 		if test
-			obj = @test_hash
+			movies = @test_hash[:users_reviewed]
+			ratings = @test_hash[:users_ratings]
 		else
-			obj = @training_hash
+			movies = @training_hash[:users_reviewed]
+			ratings = @training_hash[:users_ratings]
 		end
-
-		movies = obj[:users_reviewed]
-		ratings = obj[:users_ratings]
 
 		# Find movies that user1 and user2 reviewed in common
 		intersect = movies[user1-1]&movies(user2)
