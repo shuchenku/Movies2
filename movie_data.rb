@@ -79,13 +79,13 @@ class MovieData
 	def popularity(movie_id)
 
 		movies = @training_hash[:review_count][movie_id-1]
-		if movies == 0
-			# A movie that no one reviewed has a popularity index of 0 
-			return 0
-		end
+		# if movies == 0
+		# 	# A movie that no one reviewed has a popularity index of 0 
+		# 	return 0
+		# end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(movies,@training_hash[:review_count].max)*100).round
+		return pop = (Math::log(movies+1,@training_hash[:review_count].max+1)*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
@@ -244,14 +244,14 @@ end
 
 
 test = MovieData.new('ml-100k',:u4)
-test_obj = test.run_test()
+# test_obj = test.run_test()
 test.print_popularity_list(test.popularity_list())
 
 
-puts "mean err: #{test_obj.mean}"
-puts "stddev: #{test_obj.stddev}"
-puts "rms: #{test_obj.rms}"
-puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
+# puts "mean err: #{test_obj.mean}"
+# puts "stddev: #{test_obj.stddev}"
+# puts "rms: #{test_obj.rms}"
+# puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
