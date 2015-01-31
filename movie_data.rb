@@ -110,12 +110,13 @@ class MovieData
 
 		# Check if current run is for item in training set or test set
 		if test
-			movies = @test_hash[:users_reviewed]
-			ratings = @test_hash[:users_ratings]
+			obj = @test_hash
 		else
-			movies = @training_hash[:users_reviewed]
-			ratings = @training_hash[:users_ratings]
+			obj = @training_hash
 		end
+
+		movies = obj[:users_reviewed]
+		ratings = obj[:users_ratings]
 
 		# Find movies that user1 and user2 reviewed in common
 		intersect = movies[user1-1]&movies(user2)
@@ -134,16 +135,16 @@ class MovieData
             user2_vec << rating(user2,el)
 		end
 
-		penalty = [intersect.size,8].min/8
-		return	sim = penalty*cosine_similarity(user1_vec,user2_vec)	
+		return	sim = cosine_similarity(user1_vec,user2_vec)	
 	end
 
 	# computes the cosine similarity of 2 input vectors
 	def cosine_similarity(vector1,vector2) 
+		penalty = [vector1.size,8].min/8
 		numerator = dot_product(vector1,vector2)
 		denominator1 = dot_product(vector1,vector1)
 		denominator2 = dot_product(vector2,vector2)
-		cossim = numerator/Math::sqrt(denominator1*denominator2)
+		cossim = penalty*numerator/Math::sqrt(denominator1*denominator2)
 		return cossim
 	end
 
