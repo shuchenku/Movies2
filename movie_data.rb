@@ -85,7 +85,9 @@ class MovieData
 		# end
 
 		# Take the log of review count and rescale to 0~100
-		return pop = (Math::log(movies+1,@training_hash[:review_count].max+1)*100).round
+		x = movies+1
+		base = @training_hash[:review_count].max+1
+		return pop = (Math::log(x,base)*100).round
 	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
