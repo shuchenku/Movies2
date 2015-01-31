@@ -18,9 +18,8 @@ class MovieData
 			@data = File.join(dir,"u.data")
 		else # run prediction
 			@data = File.join(dir,test.to_s << ".base")
-			@test = File.join(dir,test.to_s << ".test")
 			# hashmap to store data read from file as well as organized data structures
-			@test_hash = load_data(@test)
+			@test_hash = load_data(File.join(dir,test.to_s << ".test"))
 		end	
 
 		# load data from file(s)
