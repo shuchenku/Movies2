@@ -56,7 +56,6 @@ class MovieData
 				users_ratings[cur_line[0]-1] << cur_line[2]
 				h.push(cur_line)
 			end
-			f.close()
 		end
 
 		# hash to store the above arrays
