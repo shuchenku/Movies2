@@ -139,6 +139,7 @@ class MovieData
 		return	sim = penalty*cosine_similarity(user1_vec,user2_vec)	
 	end
 
+	# computes the cosine similarity of 2 input vectors
 	def cosine_similarity(vector1,vector2) 
 		numerator = dot_product(vector1,vector2)
 		denominator1 = dot_product(vector1,vector1)

@@ -1,11 +1,13 @@
 class MovieTest
 
 	def initialize(predictions,test_data)
-		@u = test_data.transpose[0]
-		@m = test_data.transpose[1]
-		@r = test_data.transpose[2]
-		@p = predictions
+		
 		@test_data = test_data
+		test_data.transpose!
+		@u = test_data[0]
+		@m = test_data[1]
+		@r = test_data[2]
+		@p = predictions
 
 	end
 
