@@ -67,9 +67,8 @@ class MovieData
 	def avg_ratings()
 			# Array of movies' averge ratings received
 			average_rating = Array.new(@item_count){3}
-			training = @training_hash
-			total_stars = training[:total_stars]
-			review_count = training[:review_count]
+			total_stars = @training_hash[:total_stars]
+			review_count = @training_hash[:review_count]
 			average_rating.each_with_index {|avg,idx| 
 				stars = total_stars[idx]
 				reviews = review_count[idx]
@@ -95,7 +94,7 @@ class MovieData
 	def popularity_list()
 
 		# Make a hash of all movies' popularity indices
-		popularity_hash = Hash.new("n/a")
+		popularity_hash = Hash.new
 		(1..@item_count).each {|idx|
 		 	popularity_hash[idx] = popularity(idx)
 		}
@@ -209,7 +208,7 @@ class MovieData
 			return @training_hash[:avg_ratings][m-1]
 		end
 
-		# Otherwise predict that u will give movie m a rating equal to what his/her similar user gave
+		# Otherwise predict that u will give movie m a rating equal to what his/her similar users gave in average
 		total_stars = rates_by_su.inject(0) {|sum,el|
 				sum + rating(el,m)
 			}
@@ -236,7 +235,8 @@ class MovieData
 		user_idx[(0..max)].each_with_index {|uidx,idx|
 			predictions << predict(uidx-1,item_idx[idx])
 		}
-	 	predictions_obj = MovieTest.new(predictions,temp)
+	 	
+	 	return predictions_obj = MovieTest.new(predictions,temp)
 
 	end
 
