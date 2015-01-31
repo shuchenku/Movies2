@@ -38,8 +38,6 @@ class MovieData
 		total_stars = Array.new(@item_count){0}		
 		# Array of arrays. Each subarry stores users that viewed movies corresponding to idx in the main array 
 		movies_viewed_by = Array.new(@item_count){[]}
-		# Array of movies' averge ratings received
-		average_rating = Array.new(@item_count){3}
 		# Array of arrays. Each subarry stores movie idx viewed by user corresponding to idx in the main array 
 		users_reviewed = Array.new(@user_count){[]}
 		# Array of arrays. Each subarry stores ratings given by user corresponding to idx in the main array 
