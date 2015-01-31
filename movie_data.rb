@@ -227,8 +227,8 @@ class MovieData
 		user_idx = temp.transpose[0]
 		item_idx = temp.transpose[1]
 
-		user_idx[(0..max)].each_with_index {|uidx,idx|
-			predictions << predict(uidx-1,item_idx[idx])
+		(0..max).each_with_index {|idx|
+			predictions << predict(user_idx[idx],item_idx[idx])
 		}
 	 	
 	 	return predictions_obj = MovieTest.new(predictions,temp)
