@@ -22,7 +22,6 @@ class MovieData
 
 		# load data from file(s)
 		@training_hash = load_data(@data)
-		@training_hash[:avg_ratings] = avg_ratings()
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
@@ -62,28 +61,23 @@ class MovieData
 
 	end
 
-	def avg_ratings()
-			# Array of movies' averge ratings received
-			average_rating = Array.new(@item_count){3}
-			total_stars = @training_hash[:total_stars]
-			review_count = @training_hash[:review_count]
-			average_rating.each_with_index {|avg,idx| 
-				stars = total_stars[idx]
-				reviews = review_count[idx]
-				avg = (stars.to_f/reviews).round unless reviews == 0
-		}
-		return average_rating
+	# Average rating of movie m
+	def avg_rating(m)
+
+		total_stars = @training_hash[:total_stars][m-1]
+		review_count = @training_hash[:review_count][m-1]
+		if total_stars == 0
+			avg = 0
+		else
+			avg = (total_stars.to_f/review_count).round
+		end
+		return avg
 	end
 
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
 	def popularity(movie_id)
 
 		movies = @training_hash[:review_count][movie_id-1]
-		# if movies == 0
-		# 	# A movie that no one reviewed has a popularity index of 0 
-		# 	return 0
-		# end
-
 		# Take the log of review count and rescale to 0~100
 		x = movies+1
 		base = @training_hash[:review_count].max+1
@@ -205,7 +199,7 @@ class MovieData
 
 		# If no such users then assume u will give it an average rating
 		if rates_by_su.empty?
-			return @training_hash[:avg_ratings][m-1]
+			return avg_rating(m)
 		end
 
 		# Otherwise predict that u will give movie m a rating equal to what his/her similar users gave in average
@@ -246,8 +240,8 @@ end
 
 
 test = MovieData.new('ml-100k',:u4)
-# test_obj = test.run_test()
-test.print_popularity_list(test.popularity_list())
+test_obj = test.run_test()
+# test.print_popularity_list(test.popularity_list())
 
 
 # puts "mean err: #{test_obj.mean}"
