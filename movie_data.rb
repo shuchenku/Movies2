@@ -28,7 +28,7 @@ class MovieData
 	end
 
 	# this will read in the data from the original ml-100k files and stores them in whichever way it needs to be stored
-	def load_data(param,test = false)
+	def load_data(param)
 		# read file into a 2D array
 		h = []
 
