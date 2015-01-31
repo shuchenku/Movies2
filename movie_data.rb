@@ -64,12 +64,12 @@ class MovieData
 	# Average rating of movie m
 	def avg_rating(m)
 
-		total_stars = @training_hash[:total_stars][m-1]
+		total_stars = @training_hash[:total_stars]
 		review_count = @training_hash[:review_count][m-1]
-		if total_stars == 0
+		if total_stars[m-1] == 0
 			avg = 0
 		else
-			avg = (total_stars.to_f/review_count).round
+			avg = (total_stars[m-1].to_f/review_count[m-1]).round
 		end
 		return avg
 	end
@@ -244,10 +244,10 @@ test_obj = test.run_test()
 # test.print_popularity_list(test.popularity_list())
 
 
-# puts "mean err: #{test_obj.mean}"
-# puts "stddev: #{test_obj.stddev}"
-# puts "rms: #{test_obj.rms}"
-# puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
+puts "mean err: #{test_obj.mean}"
+puts "stddev: #{test_obj.stddev}"
+puts "rms: #{test_obj.rms}"
+puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
