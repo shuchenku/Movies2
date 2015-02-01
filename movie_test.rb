@@ -6,7 +6,6 @@ class MovieTest
 		@r = test_data.transpose[2]
 		@p = predictions
 		@test_data = test_data
-
 	end
 
 	# returns the average predication error
@@ -28,7 +27,6 @@ class MovieTest
 
 	# returns the root mean square error of the prediction
 	def rms
-
 		sqrd = @p.each_with_index.inject(0) {|sum,(el,idx)|
 			sum + (@r[idx] - el)**2
 		}
