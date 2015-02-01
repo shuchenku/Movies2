@@ -12,7 +12,7 @@ class MovieData
 			# @user_count = info_file[0].split[0].to_i
 
 			# cached similar users lists
-			# @similar_user_cached = Hash.new
+			@similar_user_cached = Hash.new
 
 		if test.nil? # train full data (u.data) 
 			@data = File.join(dir,"u.data")
@@ -99,9 +99,9 @@ class MovieData
 	end
 
 	# Print out the list if needed
-	def print_popularity_list(poplist)
-		poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
-	end
+	# def print_popularity_list(poplist)
+	# 	poplist.each {|row| puts "Movie ID: #{row[0]};\t Popularity Index: #{row[1]}"}
+	# end
 
 	# this will generate a number which indicates the similarity in movie preference between user1 and user2 (where higher numbers indicate greater similarity)
 	def similarity(user1,user2,test = nil)
@@ -156,7 +156,7 @@ class MovieData
 	# this return a list of users whose tastes are most similar to the tastes of user u
 	def most_similar(u,test = nil)
 		# If the object user's similar users have already been computed, read from hash
-		# return @similar_user_cached[u] unless @similar_user_cached[u].nil?
+		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
@@ -166,7 +166,7 @@ class MovieData
 		}
 
 		# Cache the similar users list
-		# @similar_user_cached[u] = most_similar_users
+		@similar_user_cached[u] = most_similar_users
 		return most_similar_users
 	end
 
@@ -225,7 +225,7 @@ class MovieData
 		user_idx = temp.transpose[0]
 		item_idx = temp.transpose[1]
 
-		(0..max).each_with_index {|idx|
+		(0..max-1).each_with_index {|idx|
 			predictions << predict(user_idx[idx],item_idx[idx])
 		}
 	 	
