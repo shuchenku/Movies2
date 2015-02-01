@@ -12,7 +12,7 @@ class MovieData
 			# @user_count = info_file[0].split[0].to_i
 
 			# cached similar users lists
-			@similar_user_cached = Hash.new
+			# @similar_user_cached = Hash.new
 
 		if test.nil? # train full data (u.data) 
 			@data = File.join(dir,"u.data")
@@ -30,7 +30,6 @@ class MovieData
 	def load_data(param)
 		# read file into a 2D array
 		h = []
-
 		# number of reviews per movie
 		review_count = Array.new(@item_count){0}
 		# total stars received per movie
@@ -79,7 +78,6 @@ class MovieData
 
 		x = @training_hash[:review_count][movie_id-1]+1
 		base = @training_hash[:review_count].max+1
-
 		# Take the log of review count and rescale to 0~100
 		return pop = (Math::log(x,base)*100).round
 	end
@@ -158,7 +156,7 @@ class MovieData
 	# this return a list of users whose tastes are most similar to the tastes of user u
 	def most_similar(u,test = nil)
 		# If the object user's similar users have already been computed, read from hash
-		return @similar_user_cached[u] unless @similar_user_cached[u].nil?
+		# return @similar_user_cached[u] unless @similar_user_cached[u].nil?
 
 		# Users that has cosine similiarity >0.5 with the object user are added to the similar users list
 		most_similar_users = []
@@ -168,7 +166,7 @@ class MovieData
 		}
 
 		# Cache the similar users list
-		@similar_user_cached[u] = most_similar_users
+		# @similar_user_cached[u] = most_similar_users
 		return most_similar_users
 	end
 
@@ -241,7 +239,7 @@ end
 
 
 test = MovieData.new('ml-100k',:u4)
-test_obj = test.run_test()
+test_obj = test.run_test(1000)
 # test.print_popularity_list(test.popularity_list())
 
 
