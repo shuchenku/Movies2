@@ -74,29 +74,29 @@ class MovieData
 	end
 
 	# this will return a number that indicates the popularity (higher numbers are more popular). You should be prepared to explain the reasoning behind your definition of popularity
-	# def popularity(movie_id)
+	def popularity(movie_id)
 
-	# 	x = @training_hash[:review_count][movie_id-1]+1
-	# 	base = @training_hash[:review_count].max+1
-	# 	# Take the log of review count and rescale to 0~100
-	# 	return pop = (Math::log(x,base)*100).round
-	# end
+		x = @training_hash[:review_count][movie_id-1]+1
+		base = @training_hash[:review_count].max+1
+		# Take the log of review count and rescale to 0~100
+		return pop = (Math::log(x,base)*100).round
+	end
 
 	# this will generate a list of all movie_id’s ordered by decreasing popularity
-	# def popularity_list()
+	def popularity_list()
 
-	# 	# Make a hash of all movies' popularity indices
-	# 	popularity_hash = Hash.new
-	# 	(1..@item_count).each {|idx|
-	# 	 	popularity_hash[idx] = popularity(idx)
-	# 	}
+		# Make a hash of all movies' popularity indices
+		popularity_hash = Hash.new
+		(1..@item_count).each {|idx|
+		 	popularity_hash[idx] = popularity(idx)
+		}
 
-	# 	# Sort the hash
-	# 	poplist = popularity_hash.sort_by{|k,v| v}.reverse
+		# Sort the hash
+		poplist = popularity_hash.sort_by{|k,v| v}.reverse
 
-	# 	# Print out the list if needed
-	# 	return poplist
-	# end
+		# Print out the list if needed
+		return poplist
+	end
 
 	# Print out the list if needed
 	# def print_popularity_list(poplist)
