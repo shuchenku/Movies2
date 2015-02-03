@@ -238,8 +238,8 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u5)
-test_obj = test.run_test()
+test = MovieData.new('ml-100k',:u1)
+test_obj = test.run_test(10000)
 # test.print_popularity_list(test.popularity_list())
 
 
@@ -260,10 +260,10 @@ puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
 # RUNTIME
 #   Test size(u1) Runtime
-# 	10 			  1.1s
-#   100 		  1.1s
-#   1,000		  3.0s
-#   10,000		  27.2s
+# 	10 			  1.0s
+#   100 		  1.0s
+#   1,000		  3.1s
+#   10,000		  27.4s
 #   20,000		  54.8s
 #   20,000(u3,4,5) ~70s
 
