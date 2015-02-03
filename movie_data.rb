@@ -238,8 +238,8 @@ end
 
 
 
-test = MovieData.new('ml-100k',:u4)
-test_obj = test.run_test(1000)
+test = MovieData.new('ml-100k',:u5)
+test_obj = test.run_test()
 # test.print_popularity_list(test.popularity_list())
 
 
@@ -248,21 +248,24 @@ puts "stddev: #{test_obj.stddev}"
 puts "rms: #{test_obj.rms}"
 puts "Array size #{test_obj.to_a.size}X#{test_obj.to_a[0].size}"
 
+
+# MEAN ERROR
 # 	  Pearson     Cosine
 #     0.5 cutoff  0.5 cutoff
-# u1: 0.83735	  0.81215
-# u2: 0.82475	  0.8134
-# u3: 0.8153	  0.81165
-# u4: 0.80705	  0.8145
-# u5: 0.81275	  0.82285
+# u1: 0.83735	  0.7959
+# u2: 0.82475	  0.79305
+# u3: 0.8153	  0.7912
+# u4: 0.80705	  0.7916
+# u5: 0.81275	  0.7966
 
+# RUNTIME
 #   Test size(u1) Runtime
 # 	10 			  1.1s
 #   100 		  1.1s
 #   1,000		  3.0s
 #   10,000		  27.2s
-#   20,000		  67.6s
-#   20,000(u3,4,5)~150s
+#   20,000		  54.8s
+#   20,000(u3,4,5) ~70s
 
 
 

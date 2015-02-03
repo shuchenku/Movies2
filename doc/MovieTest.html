@@ -140,7 +140,6 @@
         <span class="ruby-ivar">@r</span> = <span class="ruby-identifier">test_data</span>.<span class="ruby-identifier">transpose</span>[<span class="ruby-value">2</span>]
         <span class="ruby-ivar">@p</span> = <span class="ruby-identifier">predictions</span>
         <span class="ruby-ivar">@test_data</span> = <span class="ruby-identifier">test_data</span>
-
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -179,7 +178,7 @@
 
           
           <div class="method-source-code" id="mean-source">
-            <pre><span class="ruby-comment"># File movie_test.rb, line 13</span>
+            <pre><span class="ruby-comment"># File movie_test.rb, line 12</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">mean</span>()
         <span class="ruby-identifier">diff</span> = <span class="ruby-ivar">@p</span>.<span class="ruby-identifier">each_with_index</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">sum</span>,(<span class="ruby-identifier">el</span>,<span class="ruby-identifier">idx</span>)<span class="ruby-operator">|</span>
                 <span class="ruby-identifier">sum</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@r</span>[<span class="ruby-identifier">idx</span>] <span class="ruby-operator">-</span> <span class="ruby-identifier">el</span>).<span class="ruby-identifier">abs</span>
@@ -215,9 +214,8 @@
 
           
           <div class="method-source-code" id="rms-source">
-            <pre><span class="ruby-comment"># File movie_test.rb, line 30</span>
+            <pre><span class="ruby-comment"># File movie_test.rb, line 29</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">rms</span>
-
         <span class="ruby-identifier">sqrd</span> = <span class="ruby-ivar">@p</span>.<span class="ruby-identifier">each_with_index</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">sum</span>,(<span class="ruby-identifier">el</span>,<span class="ruby-identifier">idx</span>)<span class="ruby-operator">|</span>
                 <span class="ruby-identifier">sum</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@r</span>[<span class="ruby-identifier">idx</span>] <span class="ruby-operator">-</span> <span class="ruby-identifier">el</span>)<span class="ruby-operator">**</span><span class="ruby-value">2</span>
         }
@@ -252,7 +250,7 @@
 
           
           <div class="method-source-code" id="stddev-source">
-            <pre><span class="ruby-comment"># File movie_test.rb, line 21</span>
+            <pre><span class="ruby-comment"># File movie_test.rb, line 20</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">stddev</span>
         <span class="ruby-identifier">avgerr</span> = <span class="ruby-identifier">mean</span>()
         <span class="ruby-identifier">sqrd</span> = <span class="ruby-ivar">@p</span>.<span class="ruby-identifier">each_with_index</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">sum</span>,(<span class="ruby-identifier">el</span>,<span class="ruby-identifier">idx</span>)<span class="ruby-operator">|</span>
@@ -289,7 +287,7 @@
 
           
           <div class="method-source-code" id="to_a-source">
-            <pre><span class="ruby-comment"># File movie_test.rb, line 39</span>
+            <pre><span class="ruby-comment"># File movie_test.rb, line 37</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">to_a</span>
         <span class="ruby-keyword">return</span> (<span class="ruby-ivar">@test_data</span>[(<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-ivar">@p</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>)].<span class="ruby-identifier">transpose</span>[(<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>)] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@p</span>).<span class="ruby-identifier">transpose</span>
 <span class="ruby-keyword">end</span></pre>
