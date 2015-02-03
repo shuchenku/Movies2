@@ -1,5 +1,9 @@
 # movies-2
 
+GitHub repo:  shuchenku/PA2_movies2
+https://github.com/shuchenku/PA2_movies2.git
+
+
 CODECLIMATE REPORTS:
 
 MovieData class: https://codeclimate.com/repos/54cac94ae30ba00498001947/MovieData
